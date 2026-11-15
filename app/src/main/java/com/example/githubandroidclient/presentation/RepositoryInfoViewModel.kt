@@ -1,4 +1,6 @@
 package com.example.githubandroidclient.presentation
 
-class RepositoryInfoViewModel {
+import androidx.lifecycle.ViewModel
+
+class RepositoryInfoViewModel: ViewModel() {
 }

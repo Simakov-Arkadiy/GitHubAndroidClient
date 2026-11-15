@@ -11,11 +11,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
@@ -24,13 +28,28 @@ import androidx.compose.ui.unit.dp
 import com.example.githubandroidclient.R
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.runtime.getValue
+import androidx.navigation.NavController
 
 @Composable
-fun AuthScreen(viewModel: AuthViewModel) {
+fun AuthScreen(viewModel: AuthViewModel, navController: NavController) {
+    val screenState by viewModel.screenState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        viewModel.actions.collect { action ->
+            when (action) {
+                is AuthViewModel.Action.RouteToMain -> navController.navigate("RepositoriesListScreen")
+            }
+        }
+    }
+
     BoxWithConstraints(
         modifier = Modifier
+            .statusBarsPadding()
             .background(color = colorResource(R.color.backGround))
-            .fillMaxSize(1F),
+            .fillMaxSize(1F)
+            .padding(24.dp),
     ) {
         Box(
             modifier = Modifier
@@ -58,25 +77,40 @@ fun AuthScreen(viewModel: AuthViewModel) {
             modifier = Modifier
                 .align(Alignment.TopCenter)
                 .offset(y = maxHeight * 0.35f),
-            value = "",
-            onValueChange = {},
+            value = viewModel.valueForTokenTextField.collectAsStateWithLifecycle().value,
+            onValueChange = viewModel::onSymbolChanged,
             label = {
                 Text(
                     text = "Personal access token",
                 )
             },
+            isError = screenState is AuthViewModel.ScreenState.InvalidInput,
+            supportingText = {
+                if (screenState is AuthViewModel.ScreenState.InvalidInput) {
+                    Text((screenState as AuthViewModel.ScreenState.InvalidInput).reason)
+                }
+            }
         )
     }
-    Box(modifier = Modifier
-        .fillMaxSize(1f)
-        .padding(bottom = 80.dp)
-        .imePadding()){
+    Box(
+        modifier = Modifier
+            .fillMaxSize(1f)
+            .padding(bottom = 80.dp)
+            .imePadding()
+    ) {
         Button(
-            onClick = {},
+            onClick = viewModel::onSignButtonPressed,
+            enabled = screenState !is AuthViewModel.ScreenState.Loading,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth(0.8f)
                 .height(50.dp),
-        ) { Text("SIGN IN") }
+        ) {
+            if (screenState is AuthViewModel.ScreenState.Loading) {
+                CircularProgressIndicator(modifier = Modifier.size(20.dp))
+            } else {
+                Text("SIGN IN")
+            }
+        }
     }
 }

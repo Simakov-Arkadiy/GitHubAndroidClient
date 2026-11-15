@@ -1,7 +1,9 @@
 package com.example.githubandroidclient.data
 
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class UserInfo(
     val login: String,
     val id: Int,

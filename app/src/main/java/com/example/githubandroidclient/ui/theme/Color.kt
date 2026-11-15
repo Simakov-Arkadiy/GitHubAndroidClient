@@ -12,3 +12,7 @@ val SurfaceContainerHighest = Color(13, 17, 23)
 val OnSurface = Color.White
 
 val Error = Color(176,0,32)
+
+val Surface = Color(13,17,23)
+
+val OutLineVariant = Color(33,38,45)

@@ -3,6 +3,6 @@ package com.example.githubandroidclient.presentation
 import androidx.compose.runtime.Composable
 
 @Composable
-fun DetailInfoScreen(){
+fun DetailInfoScreen(viewModel: RepositoryInfoViewModel, repoId: String){
 
 }
