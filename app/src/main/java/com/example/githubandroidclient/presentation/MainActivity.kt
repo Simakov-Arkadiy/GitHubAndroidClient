@@ -12,7 +12,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.githubandroidclient.ui.theme.GitHubAndroidClientTheme
 import org.koin.androidx.compose.koinViewModel
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,17 +32,28 @@ class MainActivity : ComponentActivity() {
                     composable("RepositoriesListScreen") {
                         RepositoriesListScreen(
                             viewModel = koinViewModel(),
-                            navController = navController
+                            navController = navController,
                         )
                     }
                     composable(
                         "DetailInfoScreen/{repoId}",
-                        arguments = listOf(navArgument("repoId") {
-                            type =
-                                NavType.StringType
-                        })
-                    ) {entry ->
-                        DetailInfoScreen(viewModel = koinViewModel(), repoId = entry.arguments?.getString("repoId")?: "0")
+                        arguments = listOf(
+                            navArgument("repoId") {
+                                type =
+                                    NavType.LongType
+                            },
+                        )
+                    ) { entry ->
+                        DetailInfoScreen(
+                            viewModel = koinViewModel<RepositoryInfoViewModel> {
+                                parametersOf(
+                                    entry.arguments?.getLong(
+                                        "repoId"
+                                    ) ?: 0
+                                )
+                            },
+                            navController = navController,
+                        )
                     }
                 }
             }

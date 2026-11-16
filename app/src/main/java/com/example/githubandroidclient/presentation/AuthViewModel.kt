@@ -1,9 +1,9 @@
 package com.example.githubandroidclient.presentation
 
-import android.util.Log
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.githubandroidclient.R
 import com.example.githubandroidclient.data.AppRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -13,15 +13,17 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class AuthViewModel(val repository: AppRepository) : ViewModel() {
-    private val _screenState = MutableStateFlow<ScreenState>(ScreenState.Idle)
-    val screenState: StateFlow<ScreenState> = _screenState
+    private val _screenState = MutableStateFlow<AuthScreenState>(AuthScreenState.Idle)
+    val screenState: StateFlow<AuthScreenState> = _screenState
 
-    private val _valueForTokenTextField = MutableStateFlow<TextFieldValue>(TextFieldValue(text = ""))
+    private val _valueForTokenTextField =
+        MutableStateFlow<TextFieldValue>(TextFieldValue(text = ""))
     val valueForTokenTextField: StateFlow<TextFieldValue> = _valueForTokenTextField
 
-    private val _actions = MutableSharedFlow<Action>(extraBufferCapacity = 1)
-    val actions: SharedFlow<Action> = _actions
-    init{
+    private val _actions = MutableSharedFlow<AuthScreenAction>(extraBufferCapacity = 1)
+    val actions: SharedFlow<AuthScreenAction> = _actions
+
+    init {
         viewModelScope.launch {
             _valueForTokenTextField.value = TextFieldValue(repository.getToken().first())
         }
@@ -29,35 +31,34 @@ class AuthViewModel(val repository: AppRepository) : ViewModel() {
 
     fun onSignButtonPressed() {
         if (_valueForTokenTextField.value.text.isBlank()) {
-            _screenState.value = ScreenState.InvalidInput("Токен не может быть пустым")
+            _screenState.value = AuthScreenState.InvalidInput(R.string.emptyField)
             return
         }
         viewModelScope.launch {
-            _screenState.value = ScreenState.Loading
+            _screenState.value = AuthScreenState.Loading
             val result = repository.signIn(_valueForTokenTextField.value.text)
-            if(result.isSuccess){
-                _screenState.value = ScreenState.Idle
-                _actions.emit(Action.RouteToMain)
-            }
-            else{
+            if (result.isSuccess) {
+                _screenState.value = AuthScreenState.Idle
+                _actions.emit(AuthScreenAction.RouteToMain)
+            } else {
                 _screenState.value =
-                    ScreenState.InvalidInput(result.exceptionOrNull()?.message?: "Неизвестная ошибка")
+                    AuthScreenState.InvalidInput(R.string.failedToken)
             }
         }
     }
 
     fun onSymbolChanged(newValue: TextFieldValue) {
-        _screenState.value = ScreenState.Idle
+        _screenState.value = AuthScreenState.Idle
         _valueForTokenTextField.value = newValue
     }
 
-    sealed interface ScreenState {
-        object Idle : ScreenState
-        object Loading : ScreenState
-        data class InvalidInput(val reason: String) : ScreenState
+    sealed interface AuthScreenState {
+        object Idle : AuthScreenState
+        object Loading : AuthScreenState
+        data class InvalidInput(val reason: Int) : AuthScreenState
     }
 
-    sealed interface Action {
-        object RouteToMain : Action
+    sealed interface AuthScreenAction {
+        object RouteToMain : AuthScreenAction
     }
 }

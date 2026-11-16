@@ -1,5 +1,6 @@
 package com.example.githubandroidclient.presentation
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,7 +22,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.painterResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.githubandroidclient.R
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
@@ -29,6 +29,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -41,9 +42,12 @@ fun RepositoriesListScreen(viewModel: RepositoriesListViewModel, navController: 
     LaunchedEffect(Unit) {
         viewModel.actions.collect { action ->
             when (action) {
-                is RepositoriesListViewModel.Action.RouteToAuthScreen -> navController.navigate("AuthScreen")
-                is RepositoriesListViewModel.Action.RouteToDetailInfoScreen -> navController.navigate(
-                    "DetailInfoScreen"
+                is RepositoriesListViewModel.RepositoriesListScreenAction.RouteToAuthScreen -> navController.navigate(
+                    "AuthScreen"
+                )
+
+                is RepositoriesListViewModel.RepositoriesListScreenAction.RouteToDetailInfoScreen -> navController.navigate(
+                    "DetailInfoScreen/${action.repoId}"
                 )
             }
         }
@@ -55,24 +59,14 @@ fun RepositoriesListScreen(viewModel: RepositoriesListViewModel, navController: 
             .statusBarsPadding()
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
-            Row(
-                modifier = Modifier
-                    .padding(24.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text("Your repositories", fontSize = 30.sp)
+            TopBarItem {
+                Text(stringResource(R.string.headerRepositoriesListScreen), fontSize = 30.sp)
                 IconButton(onClick = viewModel::logOutButtonPressed) {
-                    Icon(
-                        modifier = Modifier.size(40.dp),
-                        painter = painterResource(id = R.drawable.logout),
-                        contentDescription = "Выйти"
-                    )
+                    TopBarIconItem(R.drawable.logout)
                 }
             }
             when (screenState) {
-                is RepositoriesListViewModel.ScreenState.Loading -> {
+                is RepositoriesListViewModel.RepositoriesListScreenState.Loading -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
@@ -81,7 +75,7 @@ fun RepositoriesListScreen(viewModel: RepositoriesListViewModel, navController: 
                     }
                 }
 
-                is RepositoriesListViewModel.ScreenState.Loaded -> {
+                is RepositoriesListViewModel.RepositoriesListScreenState.Loaded -> {
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxSize()
@@ -89,11 +83,11 @@ fun RepositoriesListScreen(viewModel: RepositoriesListViewModel, navController: 
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                         contentPadding = PaddingValues(16.dp)
                     ) {
-                        itemsIndexed((screenState as RepositoriesListViewModel.ScreenState.Loaded).repos) { index, repo ->
+                        itemsIndexed((screenState as RepositoriesListViewModel.RepositoriesListScreenState.Loaded).repos) { index, repo ->
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .clickable(onClick = {viewModel.clickableRowPressed(repo.id.toString())})
+                                    .clickable(onClick = { viewModel.clickableRowPressed(repo.id.toString()) })
                             ) {
                                 Column(modifier = Modifier.fillMaxWidth()) {
                                     Row(
@@ -113,7 +107,7 @@ fun RepositoriesListScreen(viewModel: RepositoriesListViewModel, navController: 
                                     }
                                     Text(repo.description ?: "")
                                 }
-                                if (index < (screenState as RepositoriesListViewModel.ScreenState.Loaded).repos.size - 1) {
+                                if (index < (screenState as RepositoriesListViewModel.RepositoriesListScreenState.Loaded).repos.size - 1) {
                                     HorizontalDivider(
                                         thickness = 1.dp,
                                     )
@@ -123,16 +117,16 @@ fun RepositoriesListScreen(viewModel: RepositoriesListViewModel, navController: 
                     }
                 }
 
-                is RepositoriesListViewModel.ScreenState.Error -> {
+                is RepositoriesListViewModel.RepositoriesListScreenState.Error -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text((screenState as RepositoriesListViewModel.ScreenState.Error).error)
+                        Text(stringResource((screenState as RepositoriesListViewModel.RepositoriesListScreenState.Error).error))
                     }
                 }
 
-                is RepositoriesListViewModel.ScreenState.Empty -> Text("")
+                is RepositoriesListViewModel.RepositoriesListScreenState.Empty -> Text("")
             }
         }
     }

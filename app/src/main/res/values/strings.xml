@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">GitHubAndroidClient</string>
+    <string name="token">"Personal access token"</string>
+    <string name="textForButtonSIGNIN">SIGN IN</string>
+    <string name="licence">License</string>
+    <string name="stars">stars</string>
+    <string name="forks">forks</string>
+    <string name="watchers">watchers</string>
+    <string name="failedToken">Invalid authentication token</string>
+    <string name="emptyField">"The field cannot be empty"</string>
+    <string name="headerRepositoriesListScreen">"Your repositories"</string>
+    <string name="errorMessageForListRepositories">Failed to retrieve the list of repositories</string>
+    <string name="errorMessageForDetailInfo">Failed to retrieve repository</string>
+    <string name="emptyReadme">The README is empty.</string>
 </resources>

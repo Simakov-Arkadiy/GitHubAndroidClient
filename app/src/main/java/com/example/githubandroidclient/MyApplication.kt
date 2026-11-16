@@ -8,7 +8,7 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.GlobalContext.startKoin
 
 
-class MyApplication: Application() {
+class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         startKoin {
@@ -17,4 +17,5 @@ class MyApplication: Application() {
         }
     }
 }
+
 val Context.dataStore by preferencesDataStore(name = "token")

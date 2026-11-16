@@ -5,7 +5,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.example.githubandroidclient.dataStore
 
-class KeyValueStorage (private val context: Context){
+class KeyValueStorage(private val context: Context) {
     companion object {
         val TOKEN_KEY = stringPreferencesKey("token")
     }

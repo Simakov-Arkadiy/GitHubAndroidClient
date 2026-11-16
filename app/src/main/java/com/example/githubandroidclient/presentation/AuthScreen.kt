@@ -1,5 +1,7 @@
 package com.example.githubandroidclient.presentation
 
+import android.content.pm.ActivityInfo
+import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -30,16 +32,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 
 @Composable
 fun AuthScreen(viewModel: AuthViewModel, navController: NavController) {
+
+    LockScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
     val screenState by viewModel.screenState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.actions.collect { action ->
             when (action) {
-                is AuthViewModel.Action.RouteToMain -> navController.navigate("RepositoriesListScreen")
+                is AuthViewModel.AuthScreenAction.RouteToMain -> navController.navigate("RepositoriesListScreen")
             }
         }
     }
@@ -81,13 +86,13 @@ fun AuthScreen(viewModel: AuthViewModel, navController: NavController) {
             onValueChange = viewModel::onSymbolChanged,
             label = {
                 Text(
-                    text = "Personal access token",
+                    text = stringResource(R.string.token),
                 )
             },
-            isError = screenState is AuthViewModel.ScreenState.InvalidInput,
+            isError = screenState is AuthViewModel.AuthScreenState.InvalidInput,
             supportingText = {
-                if (screenState is AuthViewModel.ScreenState.InvalidInput) {
-                    Text((screenState as AuthViewModel.ScreenState.InvalidInput).reason)
+                if (screenState is AuthViewModel.AuthScreenState.InvalidInput) {
+                    Text(stringResource((screenState as AuthViewModel.AuthScreenState.InvalidInput).reason))
                 }
             }
         )
@@ -100,13 +105,13 @@ fun AuthScreen(viewModel: AuthViewModel, navController: NavController) {
     ) {
         Button(
             onClick = viewModel::onSignButtonPressed,
-            enabled = screenState !is AuthViewModel.ScreenState.Loading,
+            enabled = screenState !is AuthViewModel.AuthScreenState.Loading,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth(0.8f)
                 .height(50.dp),
         ) {
-            if (screenState is AuthViewModel.ScreenState.Loading) {
+            if (screenState is AuthViewModel.AuthScreenState.Loading) {
                 CircularProgressIndicator(modifier = Modifier.size(20.dp))
             } else {
                 Text("SIGN IN")

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="token">"Персональный токен авторизации"</string>
+    <string name="textForButtonSIGNIN">ВОЙТИ</string>
+    <string name="licence">Лицензия</string>
+    <string name="stars">звезды</string>
+    <string name="forks">ответвления</string>
+    <string name="watchers">просмотры</string>
+    <string name="failedToken">Недействительный токен аутентификации</string>
+    <string name="emptyField">"Поле не может быть пустым"</string>
+    <string name="headerRepositoriesListScreen">"Твои репозитории"</string>
+    <string name="errorMessageForListRepositories">Не удалось получить список репозиториев</string>
+    <string name="errorMessageForDetailInfo">Не удалось получить репозиторий</string>
+    <string name="emptyReadme">README пуст</string>
+</resources>
